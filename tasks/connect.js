@@ -118,7 +118,17 @@ module.exports = function(grunt) {
         if (options.open === true) {
           open(options.protocol + '://' + hostname + ':' + address.port);
         } else if (typeof options.open === 'string') {
-          open(options.open);
+          // this don't work as grunt has already processed
+          // the lodash template as it does with all options
+          // probably need to copy the options logic from
+          // grunt core and remove template processing
+          open(grunt.template.process(options.open, {
+            data: {
+              protocol: options.protocol,
+              hostname: hostname,
+              port: address.port
+            }
+          }));
         }
 
         if (!keepAlive) {
