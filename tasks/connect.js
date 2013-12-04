@@ -93,11 +93,16 @@ module.exports = function(grunt) {
     var server = null;
 
     if (options.protocol === 'https') {
+      // Workaround for malfunctioning rejectUnauthorized option.
+      // See https://github.com/mikeal/request/issues/418
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
       server = https.createServer({
         key: options.key || grunt.file.read(path.join(__dirname, 'certs', 'server.key')).toString(),
         cert: options.cert || grunt.file.read(path.join(__dirname, 'certs', 'server.crt')).toString(),
         ca: options.ca || grunt.file.read(path.join(__dirname, 'certs', 'ca.crt')).toString(),
         passphrase: options.passphrase || 'grunt',
+        rejectUnauthorized: false
       }, app);
     } else {
       server = http.createServer(app);
